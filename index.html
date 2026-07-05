@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Từ vựng cấp THCS</title>
+    
+    <link rel="apple-touch-icon" href="logo.png">
+    <link rel="icon" type="image/png" href="logo.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="VocabFun">
+    <link rel="manifest" href="manifest.json">
+
+    <style>
+        :root {
+            --bg: #f0f4f8;
+            --card-bg: #ffffff;
+            --primary: #2563eb;
+            --accent: #3b82f6;
+            --text: #1e293b;
+            --danger: #ef4444;
+            --success: #22c55e;
+            --shadow: 0 4px 0 #1d4ed8;
+            --shadow-red: 0 4px 0 #b91c1c;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .header-area { margin-bottom: 25px; }
+        .app-title { font-size: 28px; font-weight: bold; margin: 0; color: var(--primary); }
+        .app-subtitle { font-size: 14px; opacity: 0.7; font-style: italic; }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            border: 1px solid rgba(0,0,0,0.02);
+        }
+
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 8px auto;
+            transition: all 0.1s;
+            box-shadow: var(--shadow);
+            width: 90%;
+            display: block;
+            font-size: 16px;
+        }
+        button:active { transform: translateY(2px); box-shadow: none; }
+
+        /* Giữ nguyên cấu hình layout nút bấm gốc của bạn */
+        .level-btn { width: 45% !important; display: inline-block !important; margin: 5px !important; height: 60px; }
+
+        .mode-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 20px; }
+        .mode-grid button { width: 100%; margin: 0; height: 75px; display: flex; align-items: center; justify-content: center; text-align: center; }
+        .btn-back { background: var(--danger); box-shadow: var(--shadow-red); }
+
+        .unit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: left; margin-top: 15px; }
+        .unit-item {
+            display: flex; align-items: center; background: #f8fafc;
+            padding: 10px; border-radius: 12px; border: 1px solid #e2e8f0;
+            font-size: 14px;
+        }
+        .unit-item input { width: 18px; height: 18px; margin-right: 8px; flex-shrink: 0; }
+        .unit-item span { flex-grow: 1; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        .word-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px; border-bottom: 1px solid #f1f5f9;
+        }
+        .speaker-icon { cursor: pointer; color: var(--primary); font-size: 20px; padding: 5px; }
+
+        .page { display: none; animation: fadeIn 0.3s ease; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .big-word { font-size: 40px; color: var(--primary); font-weight: bold; margin: 20px 0; min-height: 55px; line-height: 1.2; }
+        input {
+            width: 85%; padding: 15px; border-radius: 12px; border: 2px solid #e2e8f0;
+            font-size: 18px; margin-bottom: 15px; outline: none; text-align: center;
+        }
+
+        .bar-container { background: #e2e8f0; height: 8px; border-radius: 4px; margin: 20px 0; overflow: hidden; }
+        .bar { height: 100%; transition: width 0.1s linear; background: var(--primary); }
+
+        .recap-container { margin-top: 15px; text-align: left; background: #fff1f2; border-radius: 15px; padding: 10px; border: 1px solid #fecdd3; }
+        .recap-title { font-weight: bold; color: var(--danger); margin-bottom: 10px; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="header-area">
+        <p class="app-title"><b>Từ vựng cấp THCS</b></p>
+        <p class="app-subtitle">From a former NVL-er</p>
+	<p class="app-subtitle">Supported partly by Minh Triết</p>
+    </div>
+
+    <div id="pageLevel" class="page active">
+        <div class="card">
+            <h3>Chọn Khối Lớp</h3>
+            <button class="level-btn" onclick="selectLevel('6')">Lớp 6</button>
+            <button class="level-btn" onclick="selectLevel('7')">Lớp 7</button>
+            <button class="level-btn" onclick="selectLevel('8')">Lớp 8</button>
+            <button class="level-btn" onclick="selectLevel('9')">Lớp 9</button>
+        </div>
+        <div id="hardWordsBox" class="card" style="display:none;">
+            <h4 style="margin-top:0">Hard Words Saved</h4>
+            <div id="hardWordsList" style="font-size:12px; opacity:0.6; margin-bottom:15px"></div>
+            <button onclick="learnHardWords()" style="background:#6366f1; box-shadow: 0 4px 0 #4338ca;">Learn These Words</button>
+        </div>
+    </div>
+
+    <div id="pageUnits" class="page">
+        <div class="card">
+            <h3>Select Units</h3>
+            <div id="unitList" class="unit-grid"></div>
+            <button onclick="confirmUnits()" style="background: var(--success); box-shadow: 0 4px 0 #15803d; margin-top:25px;">Start Learning</button>
+            <button class="btn-back" onclick="showPage('pageLevel')">Back</button>
+        </div>
+    </div>
+
+    <div id="pageModes" class="page">
+        <div class="card">
+            <h3 id="modeTitle" style="margin-top:0">Select Mode</h3>
+            <div class="mode-grid">
+                <button onclick="showWordList()">Word List</button>
+                <button onclick="startReview()">Review</button>
+                <button onclick="startTyping()">Spelling Practice</button>
+                <button onclick="startGame()">Speed Game</button>
+                <button onclick="startListening()">Listening Check</button>
+                <button class="btn-back" onclick="showPage('pageUnits')">Back</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="pageWork" class="page">
+        <div class="card">
+            <div id="wordListArea" style="display:none;">
+                <h3>Word List</h3>
+                <div id="listContent" style="max-height: 420px; overflow-y: auto;"></div>
+            </div>
+
+            <div id="reviewArea" style="display:none;">
+                <div id="reviewWord" class="big-word"></div>
+                <p id="reviewHint" style="color: #64748b; min-height: 24px; font-weight: 500;"></p>
+                <button onclick="showHint()">Show Hint</button>
+                <button onclick="nextReview()">Next Word</button>
+            </div>
+
+            <div id="typingArea" style="display:none;">
+                <h3>Spelling Practice</h3>
+                <div id="typingDisplay" class="big-word" style="font-size: 32px;">Input the word</div>
+                <input id="typingInput" placeholder="Type here..." onkeyup="if(event.key==='Enter') checkTyping()">
+                <button onclick="checkTyping()" style="width: 60%;">Gửi</button>
+                <div id="typingResult" style="margin-top:10px; font-weight:bold"></div>
+            </div>
+
+            <div id="gameUI" style="display:none;">
+                <h3 id="gameModeHeader">Game</h3>
+                <div id="gameDisplay" class="big-word"></div>
+                <div id="gameOptions"></div>
+                <div class="bar-container"><div id="gameTimer" class="bar"></div></div>
+            </div>
+
+            <div id="recapArea" style="display:none;">
+                <h3 id="recapStatus">Session Finished</h3>
+                <div id="recapList" class="recap-container"></div>
+                <button id="btnRetryRecap" style="background: var(--accent); margin-top:20px;">Learn Failed Words</button>
+            </div>
+
+            <button onclick="exitToModes()" style="background: #94a3b8; box-shadow: 0 4px 0 #64748b; margin-top:20px;">Exit</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const API_KEY="AIzaSyDTI3yXucHM8LHQeSXJYYJJYVzufW0R6ik";
+
+// Cấu trúc danh mục lưu trữ chính xác 4 Sheet ID mới của khối lớp từ 6 đến 9
+const SHEETS={
+    "6": "1k3tAg6e2pFaOItlZ1IqiJIKHVEmG_aJ0fTEyu2Pd9Ro",
+    "7": "1pb6ORanMfpnvo9xAKwmr_Iu0L25thnkTc3HIrZ-sUCs",
+    "8": "1KWoTaTbLD1BRzQL_D-PlWh8lgsflt_619D4eYVzaX9E",
+    "9": "1sNNSGhaAErcRBaZ-FyfFovZ-VbarLubo6Jk0kKIbnzk"
+};
+
+let state={level:null, units:[], words:[], originalWords:[], sessionForgot:[]};
+let hardWords = JSON.parse(localStorage.getItem('nvl_hard_words') || '[]');
+
+window.onload = updateHardWordsUI;
+
+function showPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+}
+
+function speak(word, delay = 0) {
+    setTimeout(() => {
+        speechSynthesis.cancel();
+        let u = new SpeechSynthesisUtterance(word);
+        u.lang = 'en-US';
+        speechSynthesis.speak(u);
+    }, delay);
+}
+
+function saveHardWord(w) {
+    if(!hardWords.find(x => x.word === w.word)) {
+        hardWords.push(w);
+        localStorage.setItem('nvl_hard_words', JSON.stringify(hardWords));
+        updateHardWordsUI();
+    }
+}
+
+function updateHardWordsUI() {
+    const box = document.getElementById('hardWordsBox');
+    if(hardWords.length > 0) {
+        box.style.display = 'block';
+        document.getElementById('hardWordsList').textContent = hardWords.map(x=>x.word).slice(-5).join(', ') + '...';
+    }
+}
+
+function learnHardWords() {
+    state.words = [...hardWords];
+    state.originalWords = [...hardWords];
+    document.getElementById('modeTitle').textContent = "Hard Words Mode";
+    showPage('pageModes');
+}
+
+async function selectLevel(level){
+    state.level = level;
+    let res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEETS[level]}?key=${API_KEY}`);
+    let data = await res.json();
+    state.units = data.sheets.map(s => s.properties.title);
+    let html = '';
+    state.units.forEach(u => {
+        html += `<div class="unit-item"><input type="checkbox" value="${u}" class="unit-cb"><span>${u}</span></div>`;
+    });
+    unitList.innerHTML = html;
+    showPage('pageUnits');
+}
+
+async function confirmUnits() {
+    let selected = Array.from(document.querySelectorAll('.unit-cb:checked')).map(cb => cb.value);
+    if(selected.length === 0) return alert("Select at least one unit!");
+    state.words = [];
+    for(let unit of selected) {
+        let res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEETS[state.level]}/values/${unit}?key=${API_KEY}`);
+        let data = await res.json();
+        let loaded = data.values.slice(1).map(r=>({ word: r[0], parts: r[1] || r[0], hint: r[2] || '', meaning: r[3] || '' }));
+        state.words.push(...loaded);
+    }
+    state.originalWords = [...state.words];
+    showPage('pageModes');
+}
+
+function hideAllAreas() {
+    ['wordListArea','reviewArea','typingArea','gameUI','recapArea'].forEach(a => document.getElementById(a).style.display='none');
+}
+
+function exitToModes() { 
+    clearTimeout(window.gTimer); 
+    speechSynthesis.cancel();
+    state.sessionForgot = []; 
+    state.words = [...state.originalWords]; 
+    showPage('pageModes'); 
+}
+
+function renderRecap(retryFunction) {
+    hideAllAreas();
+    recapArea.style.display = 'block';
+    
+    if(state.sessionForgot.length === 0) {
+        recapStatus.textContent = "Perfect! No mistakes.";
+        recapList.innerHTML = "🌟 You mastered all words in this session!";
+        btnRetryRecap.style.display = 'none';
+    } else {
+        recapStatus.textContent = `Session Finished (${state.sessionForgot.length} mistakes)`;
+        recapList.innerHTML = `<div class="recap-title">Words to Review:</div>` + 
+            state.sessionForgot.map(w => `
+                <div class="word-row">
+                    <span><b>${w.word}</b>: ${w.meaning}</span>
+                    <span class="speaker-icon" onclick="speak('${w.word}')">🔊</span>
+                </div>
+            `).join('');
+        
+        btnRetryRecap.style.display = 'block';
+        btnRetryRecap.onclick = () => {
+            state.words = [...state.sessionForgot]; 
+            state.sessionForgot = []; 
+            retryFunction();
+        };
+    }
+}
+
+// --- MODES ---
+function showWordList() {
+    showPage('pageWork'); hideAllAreas(); wordListArea.style.display='block';
+    listContent.innerHTML = state.originalWords.map(w => `
+        <div class="word-row">
+            <span><b>${w.word}</b>: ${w.meaning}</span>
+            <span class="speaker-icon" onclick="speak('${w.word}')">🔊</span>
+        </div>
+    `).join('');
+}
+
+let ri=0;
+function startReview() {
+    showPage('pageWork'); hideAllAreas(); reviewArea.style.display='block';
+    ri=0; showReview();
+}
+function showReview() {
+    let w = state.words[ri];
+    reviewWord.textContent = w.word; reviewHint.textContent = "";
+    speak(w.word);
+}
+function showHint() { 
+    reviewHint.textContent = state.words[ri].hint; 
+    if(!state.sessionForgot.find(x => x.word === state.words[ri].word)) state.sessionForgot.push(state.words[ri]);
+    saveHardWord(state.words[ri]); 
+}
+function nextReview() {
+    ri++; 
+    if(ri >= state.words.length) return renderRecap(startReview);
+    showReview();
+}
+
+let ti=0, tCorrect=0;
+function startTyping() {
+    showPage('pageWork'); hideAllAreas(); typingArea.style.display='block';
+    ti=0; nextTyping();
+}
+function nextTyping() {
+    tCorrect=0; typingResult.textContent="";
+    let w = state.words[ti];
+    typingDisplay.textContent = "Wait for hint...";
+    speak(w.word, 500);
+    let parts = w.parts.split("-"), i = 0;
+    let inter = setInterval(() => {
+        typingDisplay.innerHTML = parts.map((p,idx)=> idx===i ? `<span style="color:var(--danger)">${p}</span>` : p).join("-");
+        i++;
+        if(i > parts.length) {
+            clearInterval(inter);
+            setTimeout(() => { typingDisplay.textContent = "Input the word"; typingInput.focus(); }, 800);
+        }
+    }, 600);
+}
+function checkTyping() {
+    let val = typingInput.value.trim().toLowerCase(), correct = state.words[ti].word.toLowerCase();
+    if(val === correct) {
+        tCorrect++; typingResult.style.color = "var(--success)"; typingResult.textContent = `Correct ${tCorrect}/3`;
+        if(tCorrect >= 3) { ti++; if(ti >= state.words.length) renderRecap(startTyping); else nextTyping(); }
+    } else {
+        if(!state.sessionForgot.find(x => x.word === state.words[ti].word)) state.sessionForgot.push(state.words[ti]);
+        saveHardWord(state.words[ti]);
+        typingDisplay.textContent = correct; speak(correct);
+        setTimeout(nextTyping, 2000);
+    }
+    typingInput.value = "";
+}
+
+let gi=0;
+function startGame() { setupGameUI("Speed Game"); nextGame(3000, false); }
+function startListening() { setupGameUI("Listening Check"); nextGame(5000, true); }
+
+function setupGameUI(title) {
+    showPage('pageWork'); hideAllAreas(); gameUI.style.display='block';
+    gameModeHeader.textContent = title;
+    gi=0; 
+    state.words = [...state.words].sort(()=>Math.random()-0.5);
+}
+
+function nextGame(duration, isListen) {
+    clearTimeout(window.gTimer);
+    if(gi >= state.words.length) return renderRecap(isListen ? startListening : startGame);
+    
+    let cur = state.words[gi];
+    gameDisplay.textContent = isListen ? "Listen to the word" : cur.word;
+    if(isListen) { speak(cur.word, 300); speak(cur.word, 1800); }
+
+    let pool = [...new Set(state.originalWords.map(x=>x.meaning))];
+    let opts = [cur.meaning, ...pool.filter(m=>m!==cur.meaning).sort(()=>Math.random()-0.5).slice(0,2)].sort(()=>Math.random()-0.5);
+
+    gameOptions.innerHTML = "";
+    opts.forEach(o => {
+        let b = document.createElement("button");
+        b.textContent = o;
+        b.onclick = () => { 
+            if(o !== cur.meaning) {
+                if(!state.sessionForgot.find(x => x.word === cur.word)) state.sessionForgot.push(cur);
+                saveHardWord(cur);
+            }
+            gi++; nextGame(duration, isListen); 
+        };
+        gameOptions.appendChild(b);
+    });
+
+    gameTimer.style.transition = "none"; gameTimer.style.width = "100%";
+    setTimeout(() => { gameTimer.style.transition = `width ${duration}ms linear`; gameTimer.style.width = "0%"; }, 50);
+    window.gTimer = setTimeout(() => { 
+        if(!state.sessionForgot.find(x => x.word === cur.word)) state.sessionForgot.push(cur);
+        saveHardWord(cur); gi++; nextGame(duration, isListen); 
+    }, duration);
+}
+</script>
+</body>
+</html>
